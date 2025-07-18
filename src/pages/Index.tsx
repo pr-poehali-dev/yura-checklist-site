@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import Icon from '@/components/ui/icon';
 import AuthForm from '@/components/AuthForm';
+import AdminPanel from '@/components/AdminPanel';
 import { database, User } from '@/services/database';
 
 interface ChecklistItem {
@@ -27,6 +28,7 @@ const Index = () => {
   const [user, setUser] = useState<User | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [checklists, setChecklists] = useState<Checklist[]>([
     {
       id: '1',
@@ -84,7 +86,7 @@ const Index = () => {
 
   const categories = ['all', 'Управление проектами', 'Продажи', 'HR', 'Финансы'];
 
-  const filteredChecklists = checklists.filter(checklist => {
+  const filteredChecklists = availableChecklists.filter(checklist => {
     const matchesSearch = checklist.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          checklist.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || checklist.category === selectedCategory;
@@ -159,6 +161,14 @@ const Index = () => {
     }));
   };
 
+  const isAdmin = user?.role === 'admin';
+  const userAssignments = user ? database.getUserAssignments(user.id) : [];
+  
+  // Фильтруем чек-листы по назначениям для обычных пользователей
+  const availableChecklists = isAdmin ? checklists : checklists.filter(checklist => 
+    userAssignments.some(assignment => assignment.checklistId === checklist.id)
+  );
+
   if (!user) {
     return <AuthForm onLogin={handleLogin} />;
   }
@@ -184,16 +194,35 @@ const Index = () => {
                 <div className="flex items-center space-x-2 text-sm text-gray-600">
                   <Icon name="User" size={16} />
                   <span>Добро пожаловать, {user.username}</span>
+                  {isAdmin && (
+                    <Badge variant="default" className="ml-2">
+                      <Icon name="Shield" size={12} className="mr-1" />
+                      Администратор
+                    </Badge>
+                  )}
                 </div>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={handleLogout}
-                  className="flex items-center space-x-1"
-                >
-                  <Icon name="LogOut" size={16} />
-                  <span>Выйти</span>
-                </Button>
+                <div className="flex items-center space-x-2">
+                  {isAdmin && (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => setShowAdminPanel(true)}
+                      className="flex items-center space-x-1"
+                    >
+                      <Icon name="Settings" size={16} />
+                      <span>Админ-панель</span>
+                    </Button>
+                  )}
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={handleLogout}
+                    className="flex items-center space-x-1"
+                  >
+                    <Icon name="LogOut" size={16} />
+                    <span>Выйти</span>
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
@@ -353,6 +382,14 @@ const Index = () => {
           </div>
         </div>
       </footer>
+      
+      {/* Админ-панель */}
+      {showAdminPanel && isAdmin && (
+        <AdminPanel 
+          currentUser={user} 
+          onClose={() => setShowAdminPanel(false)} 
+        />
+      )}
     </div>
   );
 };
