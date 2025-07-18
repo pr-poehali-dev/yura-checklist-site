@@ -161,6 +161,10 @@ const Index = () => {
     }));
   };
 
+  if (!user) {
+    return <AuthForm onLogin={handleLogin} />;
+  }
+
   const isAdmin = user?.role === 'admin';
   const userAssignments = user ? database.getUserAssignments(user.id) : [];
   
@@ -169,9 +173,12 @@ const Index = () => {
     userAssignments.some(assignment => assignment.checklistId === checklist.id)
   );
 
-  if (!user) {
-    return <AuthForm onLogin={handleLogin} />;
-  }
+  const filteredChecklists = availableChecklists.filter(checklist => {
+    const matchesSearch = checklist.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         checklist.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === 'all' || checklist.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
 
   return (
     <div className="min-h-screen bg-gray-50">
