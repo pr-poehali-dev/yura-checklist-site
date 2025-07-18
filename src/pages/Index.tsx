@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import Icon from '@/components/ui/icon';
 import AuthForm from '@/components/AuthForm';
+import { database, User } from '@/services/database';
 
 interface ChecklistItem {
   id: string;
@@ -23,7 +24,7 @@ interface Checklist {
 }
 
 const Index = () => {
-  const [user, setUser] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [checklists, setChecklists] = useState<Checklist[]>([
@@ -93,12 +94,29 @@ const Index = () => {
   const toggleChecklistItem = (checklistId: string, itemId: string) => {
     setChecklists(prev => prev.map(checklist => {
       if (checklist.id === checklistId) {
-        return {
+        const updatedChecklist = {
           ...checklist,
           items: checklist.items.map(item => 
             item.id === itemId ? { ...item, completed: !item.completed } : item
           )
         };
+        
+        // Сохраняем прогресс в базу
+        if (user) {
+          const completedItems = updatedChecklist.items
+            .filter(item => item.completed)
+            .map(item => item.id);
+          
+          database.saveProgress({
+            id: `${user.id}-${checklistId}`,
+            userId: user.id,
+            checklistId,
+            completedItems,
+            lastUpdated: new Date().toISOString()
+          });
+        }
+        
+        return updatedChecklist;
       }
       return checklist;
     }));
@@ -109,12 +127,36 @@ const Index = () => {
     return Math.round((completed / items.length) * 100);
   };
 
-  const handleLogin = (username: string) => {
-    setUser(username);
+  const handleLogin = (userData: User) => {
+    setUser(userData);
+    loadUserProgress(userData.id);
   };
 
   const handleLogout = () => {
     setUser(null);
+    // Сбрасываем прогресс чек-листов
+    setChecklists(prev => prev.map(checklist => ({
+      ...checklist,
+      items: checklist.items.map(item => ({ ...item, completed: false }))
+    })));
+  };
+
+  const loadUserProgress = (userId: string) => {
+    const userProgress = database.getUserAllProgress(userId);
+    
+    setChecklists(prev => prev.map(checklist => {
+      const progress = userProgress.find(p => p.checklistId === checklist.id);
+      if (progress) {
+        return {
+          ...checklist,
+          items: checklist.items.map(item => ({
+            ...item,
+            completed: progress.completedItems.includes(item.id)
+          }))
+        };
+      }
+      return checklist;
+    }));
   };
 
   if (!user) {
@@ -141,7 +183,7 @@ const Index = () => {
               <div className="flex items-center space-x-3">
                 <div className="flex items-center space-x-2 text-sm text-gray-600">
                   <Icon name="User" size={16} />
-                  <span>Добро пожаловать, {user}</span>
+                  <span>Добро пожаловать, {user.username}</span>
                 </div>
                 <Button 
                   variant="outline" 
