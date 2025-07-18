@@ -6,6 +6,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import Icon from '@/components/ui/icon';
+import AuthForm from '@/components/AuthForm';
 
 interface ChecklistItem {
   id: string;
@@ -22,6 +23,7 @@ interface Checklist {
 }
 
 const Index = () => {
+  const [user, setUser] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [checklists, setChecklists] = useState<Checklist[]>([
@@ -107,6 +109,18 @@ const Index = () => {
     return Math.round((completed / items.length) * 100);
   };
 
+  const handleLogin = (username: string) => {
+    setUser(username);
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+  };
+
+  if (!user) {
+    return <AuthForm onLogin={handleLogin} />;
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -117,12 +131,29 @@ const Index = () => {
               <Icon name="ClipboardList" size={32} className="text-primary" />
               <h1 className="text-2xl font-bold text-gray-900">Business Checklists</h1>
             </div>
-            <nav className="hidden md:flex space-x-8">
-              <a href="#" className="text-gray-700 hover:text-primary font-medium">Главная</a>
-              <a href="#" className="text-gray-700 hover:text-primary font-medium">Категории</a>
-              <a href="#" className="text-gray-700 hover:text-primary font-medium">О проекте</a>
-              <a href="#" className="text-gray-700 hover:text-primary font-medium">Контакты</a>
-            </nav>
+            <div className="flex items-center space-x-4">
+              <nav className="hidden md:flex space-x-8">
+                <a href="#" className="text-gray-700 hover:text-primary font-medium">Главная</a>
+                <a href="#" className="text-gray-700 hover:text-primary font-medium">Категории</a>
+                <a href="#" className="text-gray-700 hover:text-primary font-medium">О проекте</a>
+                <a href="#" className="text-gray-700 hover:text-primary font-medium">Контакты</a>
+              </nav>
+              <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-2 text-sm text-gray-600">
+                  <Icon name="User" size={16} />
+                  <span>Добро пожаловать, {user}</span>
+                </div>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleLogout}
+                  className="flex items-center space-x-1"
+                >
+                  <Icon name="LogOut" size={16} />
+                  <span>Выйти</span>
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       </header>
