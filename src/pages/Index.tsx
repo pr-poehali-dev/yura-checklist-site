@@ -86,13 +86,6 @@ const Index = () => {
 
   const categories = ['all', 'Управление проектами', 'Продажи', 'HR', 'Финансы'];
 
-  const filteredChecklists = availableChecklists.filter(checklist => {
-    const matchesSearch = checklist.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         checklist.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || checklist.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
-
   const toggleChecklistItem = (checklistId: string, itemId: string) => {
     setChecklists(prev => prev.map(checklist => {
       if (checklist.id === checklistId) {
