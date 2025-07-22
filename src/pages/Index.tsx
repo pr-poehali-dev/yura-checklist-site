@@ -186,6 +186,12 @@ const Index = () => {
             <div className="flex items-center space-x-4">
               <nav className="hidden md:flex space-x-8">
                 <a href="#" className="text-gray-700 hover:text-primary font-medium">Главная</a>
+                <button 
+                  onClick={() => setShowAdminPanel(true)}
+                  className="text-xl font-bold bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors"
+                >
+                  👥 ПОЛЬЗОВАТЕЛИ
+                </button>
                 <a href="#" className="text-gray-700 hover:text-primary font-medium">Категории</a>
                 <a href="#" className="text-gray-700 hover:text-primary font-medium">О проекте</a>
                 <a href="#" className="text-gray-700 hover:text-primary font-medium">Контакты</a>
