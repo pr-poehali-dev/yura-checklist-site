@@ -40,25 +40,35 @@ class DatabaseService {
   }
 
   private initializeDatabase() {
-    // Создаем базового админа, если его нет
+    // Создаем базового админа, если его нет, или обновляем существующего
     const users = this.getUsers();
-    if (!users.find(u => u.username === 'admin')) {
-      const adminUser: User = {
-        id: 'admin-1',
-        username: 'admin',
-        password: 'admin',
-        role: 'admin',
-        createdAt: new Date().toISOString(),
-        lastLogin: new Date().toISOString()
-      };
-      this.saveUser(adminUser);
-    }
+    const existingAdmin = users.find(u => u.username === 'admin');
+    
+    const adminUser: User = {
+      id: 'admin-1',
+      username: 'admin',
+      password: 'admin',
+      role: 'admin',
+      createdAt: existingAdmin?.createdAt || new Date().toISOString(),
+      lastLogin: new Date().toISOString()
+    };
+    
+    // Всегда сохраняем/обновляем админа, чтобы гарантировать правильную роль
+    this.saveUser(adminUser);
   }
 
   // Работа с пользователями
   getUsers(): User[] {
     const users = localStorage.getItem(this.USERS_KEY);
     return users ? JSON.parse(users) : [];
+  }
+
+  // Функция для сброса базы данных (для отладки)
+  resetDatabase(): void {
+    localStorage.removeItem(this.USERS_KEY);
+    localStorage.removeItem(this.PROGRESS_KEY);
+    localStorage.removeItem(this.ASSIGNMENTS_KEY);
+    this.initializeDatabase();
   }
 
   saveUser(user: User): void {

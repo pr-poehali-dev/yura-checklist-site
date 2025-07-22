@@ -186,13 +186,25 @@ const Index = () => {
             <div className="flex items-center space-x-4">
               <nav className="hidden md:flex space-x-8 items-center">
                 <a href="#" className="text-gray-700 hover:text-primary font-medium">Главная</a>
-                <button 
-                  onClick={() => setShowAdminPanel(true)}
-                  className="text-xl font-bold bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors"
-                  title={`Пользователь: ${user?.username}, Роль: ${user?.role}, isAdmin: ${isAdmin}`}
-                >
-                  👥 ПОЛЬЗОВАТЕЛИ {isAdmin ? '(ADMIN)' : '(USER)'}
-                </button>
+                <div className="flex items-center space-x-2">
+                  <button 
+                    onClick={() => setShowAdminPanel(true)}
+                    className="text-xl font-bold bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors"
+                    title={`Пользователь: ${user?.username}, Роль: ${user?.role}, isAdmin: ${isAdmin}`}
+                  >
+                    👥 ПОЛЬЗОВАТЕЛИ {isAdmin ? '(ADMIN)' : '(USER)'}
+                  </button>
+                  <button 
+                    onClick={() => {
+                      database.resetDatabase();
+                      window.location.reload();
+                    }}
+                    className="text-xs bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600"
+                    title="Сбросить базу данных"
+                  >
+                    🔄
+                  </button>
+                </div>
                 <a href="#" className="text-gray-700 hover:text-primary font-medium">Категории</a>
                 <a href="#" className="text-gray-700 hover:text-primary font-medium">О проекте</a>
                 <a href="#" className="text-gray-700 hover:text-primary font-medium">Контакты</a>
