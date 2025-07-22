@@ -199,12 +199,12 @@ const AdminPanel = ({ currentUser, onClose }: AdminPanelProps) => {
             <TabsList className="grid w-full grid-cols-3 h-14">
               <TabsTrigger 
                 value="users" 
-                className="text-xl font-bold bg-red-500 text-white data-[state=active]:bg-red-600 data-[state=active]:text-white hover:bg-red-400"
+                className="text-xl font-bold !bg-red-500 !text-white data-[state=active]:!bg-red-600 data-[state=active]:!text-white hover:!bg-red-400 !border-red-500"
               >
                 👥 ПОЛЬЗОВАТЕЛИ
               </TabsTrigger>
-              <TabsTrigger value="assignments">Назначения</TabsTrigger>
-              <TabsTrigger value="create">Создать</TabsTrigger>
+              <TabsTrigger value="assignments" className="text-base">Назначения</TabsTrigger>
+              <TabsTrigger value="create" className="text-base">Создать</TabsTrigger>
             </TabsList>
 
             <TabsContent value="users" className="space-y-4">
