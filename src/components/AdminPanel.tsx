@@ -196,8 +196,13 @@ const AdminPanel = ({ currentUser, onClose }: AdminPanelProps) => {
           )}
 
           <Tabs defaultValue="users" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="users">Пользователи</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-3 h-14">
+              <TabsTrigger 
+                value="users" 
+                className="text-xl font-bold bg-red-500 text-white data-[state=active]:bg-red-600 data-[state=active]:text-white hover:bg-red-400"
+              >
+                👥 ПОЛЬЗОВАТЕЛИ
+              </TabsTrigger>
               <TabsTrigger value="assignments">Назначения</TabsTrigger>
               <TabsTrigger value="create">Создать</TabsTrigger>
             </TabsList>
